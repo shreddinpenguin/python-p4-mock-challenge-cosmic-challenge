@@ -26,9 +26,9 @@ class Planet(db.Model, SerializerMixin):
     nearest_star = db.Column(db.String)
 
     # Add relationship
-
+    mission = db.relationship('Mission', back_populates='planet', cascade="all, delete")
     # Add serialization rules
-
+    serialize_rules = ('-mission.planet',)
 
 class Scientist(db.Model, SerializerMixin):
     __tablename__ = 'scientists'
@@ -38,23 +38,51 @@ class Scientist(db.Model, SerializerMixin):
     field_of_study = db.Column(db.String)
 
     # Add relationship
-
+    mission = db.relationship('Mission', back_populates='scientist', cascade="all, delete")
     # Add serialization rules
-
+    serialize_rules = ('-mission.scientist',)
     # Add validation
-
+    @validates('name')
+    def validates_name(self, key, value):
+        if not value:
+            raise ValueError("Not name")
+        return value
+    
+    @validates('field_of_study')
+    def validates_field(self, key, value):
+        if not value:
+            raise ValueError("No field of study")
+        return value
 
 class Mission(db.Model, SerializerMixin):
     __tablename__ = 'missions'
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-
+    scientist_id = db.Column(db.Integer, db.ForeignKey('scientists.id'))
+    planet_id = db.Column(db.Integer, db.ForeignKey('planets.id'))
     # Add relationships
-
+    scientist = db.relationship('Scientist', back_populates='mission')
+    planet = db.relationship('Planet', back_populates='mission')
     # Add serialization rules
-
+    serialize_rules = ('-scientist.mission', '-planet.mission',)
     # Add validation
-
+    @validates('name')
+    def validates_name(self, key, value):
+        if not value:
+            raise ValueError("Not name")
+        return value
+    
+    @validates('scientist_id')
+    def validates_sid(self, key, value):
+        if not value:
+            raise ValueError("No scientist ID")
+        return value
+    
+    @validates('planet_id')
+    def validates_pid(self, key, value):
+        if not value:
+            raise ValueError("No planet ID")
+        return value
 
 # add any models you may need.

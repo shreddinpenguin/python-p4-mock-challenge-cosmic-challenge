@@ -57,7 +57,7 @@ class TestApp:
 
             assert response['name'] == scientist.name
             assert response['field_of_study'] == scientist.field_of_study
-            assert response['missions']
+            assert response['mission']
 
     def test_returns_404_if_no_scientist(self):
         '''returns an error message and 404 status code when a scientist is searched by a non-existent ID.'''
